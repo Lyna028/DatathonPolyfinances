@@ -69,3 +69,4 @@ def long_terme_return( action, currentDay, durationDays):
 
 print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
 
+
