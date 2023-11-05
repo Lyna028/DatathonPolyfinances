@@ -13,7 +13,8 @@ openDefaultData = pd.read_csv(os.path.join(path, 'series/open.csv'))
 highDefaultData = pd.read_csv(os.path.join(path, 'series/high.csv'))
 closeDefaultData = pd.read_csv(os.path.join(path, 'series/close.csv'))
 lowDefaultData = pd.read_csv(os.path.join(path, 'series/low.csv'))
-
+marketCapDefaultData = pd.read_csv(os.path.join(path, 'series/additional_data/market_cap.csv'))
+ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.csv'))
 
 def filterYears(data) :
     filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
@@ -31,11 +32,40 @@ openData = filterYears(openDefaultData)
 highData = filterYears(highDefaultData)
 closeData = filterYears(closeDefaultData)
 lowData = filterYears(lowDefaultData)
+marketCapData = filterYears(marketCapDefaultData)
+ajustedCloseData = filterYears(ajustedCloseDefaultData)
+normaliseAjustedCloseData = normalize_data(ajustedCloseData)
 
-def averageVolume(currentDay, durationDays) :
+def averageVolume(currentDay, durationDays, company) :
     indexDay = volumeData[volumeData['timestamp'] == currentDay].index
-    filtredVolume = volumeData.iloc[indexDay[0] : indexDay[0] + durationDays + 1]
-    return  filtredVolume
+    filtredVolume = volumeData.iloc[indexDay[0] : indexDay[0] + durationDays]
+    volumSum = filtredVolume[company].sum()
+    return volumSum/durationDays
 
-print(averageVolume('2009-08-20', 4))
+def ecartTypeValue ( startDate, duration,company):
+    selectionnedDataIndex = ajustedCloseData[ajustedCloseData['timestamp'] == startDate].index
+    selectionnedData = ajustedCloseData.iloc[selectionnedDataIndex[0] : selectionnedDataIndex[0] + duration +1]
+    selectionnedDataCompany = selectionnedData[company]
+    valMax = selectionnedDataCompany.max()
+    valMin = selectionnedDataCompany.min()
+    ecartTypeValue = valMax-valMin
+    return ecartTypeValue
+
+def averageMarketCap(currentDay, durationDays, company) :
+    indexDay = marketCapData[volumeData['date'] == currentDay].index
+    filtredMerketCap = marketCapData.iloc[indexDay[0]: indexDay[0] + durationDays]
+    marketCapSum = filtredMerketCap[company].sum()
+    #return marketCapSum/durationDays
+    return filtredMerketCap
+
+def long_terme_return( action, currentDay, durationDays):
+    indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == currentDay].index
+    print(normaliseAjustedCloseData.loc[indexDay[0], action])
+    print(normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action])
+    return normaliseAjustedCloseData.loc[indexDay[0], action] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action]
+
+#def finalFilter(currentDay, durationDays) :
+
+
+print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
 
