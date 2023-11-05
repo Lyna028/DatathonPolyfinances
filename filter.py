@@ -156,6 +156,7 @@ def getTreeX(day, company):
 def createXbySector(sector, day):
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
+    # print(sectorSymbols)
     xSectorTable = list()
     indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
@@ -163,6 +164,7 @@ def createXbySector(sector, day):
             actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
             xSectorTable.append(getTreeX(actualDay, i))
     return xSectorTable
+# print(createXbySector('Health Care', '2012-11-14'))
 
 
 
