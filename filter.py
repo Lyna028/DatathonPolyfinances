@@ -15,6 +15,7 @@ closeDefaultData = pd.read_csv(os.path.join(path, 'series/close.csv'))
 lowDefaultData = pd.read_csv(os.path.join(path, 'series/low.csv'))
 marketCapDefaultData = pd.read_csv(os.path.join(path, 'series/additional_data/market_cap.csv'))
 ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.csv'))
+symbolInfo = pd.read_csv(os.path.join(path, 'series/additional_data/SP500_symbol_info.csv'))
 
 def filterYears(data) :
     filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
@@ -111,6 +112,49 @@ def getPositiveReturn(stock, currentDay, durationDays):
     # return normaliseAjustedCloseData.loc[indexDay[0]-day, company] - normaliseAjustedCloseData.loc[indexDay[0], company] 
 
 ## la suivante existe en attendant que le normalise fonctionne
+
+# def getTreeX(day, company):
+#     treeXDict = {
+#         "stockAtr" : getStockAtr(company, day, 100), # 100 est une valeur arbitraire choisi plus tard dans l'opti
+#         "snpAtr" : getSnpAtr(day, 100),
+#         "longReturn" : long_terme_return(company, day, 100),
+#         "valueGap" : gapValue(day, 100, company),
+#         "averageVolume" : averageVolume(day, 100, company),
+#         "positiveReturnRatio" : getPositiveReturn(company, day, 100),
+#         "marketCapRate" : getMarketCapRate(company, day, 100), ######################################
+#         "marketCapAverage" : getMarketCapAverage(company, day, 100), ################################
+#         "returnAverage" : getReturnAverage(company, day, 100),
+#         "returnGap" : getReturnGap(company, day, 100),
+#         "lowestClose" : getCloseLowHigh(company, day, 100)[0],
+#         "highestClose" : getCloseLowHigh(company, day, 100)[1]
+#     }
+#     return treeXDict
+
 def getTreeY(day, company, nDay):
     indexDay = closeData[closeData['timestamp'] == day].index
     return closeData.loc[indexDay[0]-nDay, 'close_' + company] - closeData.loc[indexDay[0], 'close_' + company] 
+
+def getTreeX(day, company):
+    treeXList = (getStockAtr(company, day, 100), getSnpAtr(day, 100), long_terme_return(company, day, 100), gapValue(day, 100, company),
+                 averageVolume(day, 100, company), getPositiveReturn(company, day, 100), getReturnAverage(company, day, 100), 
+                 getCloseLowHigh(company, day, 100)[0], getCloseLowHigh(company, day, 100)[1] )
+    return treeXList
+
+def createXbySector(sector, day):
+    sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
+    sectorSymbols = sectorTable['Symbol']
+    xSectorTable = list()
+    for i in sectorSymbols:
+        xSectorTable.append(getTreeX(day, i))
+    return xSectorTable
+
+def createYbySector(sector, day):
+    sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
+    sectorSymbols = sectorTable['Symbol']
+    ySectorTable = list()
+    for i in sectorSymbols:
+        ySectorTable.append(getTreeY(day, i))
+    return ySectorTable
+
+
+createXbySector('Industrials')
