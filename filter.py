@@ -33,6 +33,9 @@ closeData = filterYears(closeDefaultData)
 lowData = filterYears(lowDefaultData)
 
 def averageVolume(currentDay, durationDays) :
-    for day in durationDays :
+    indexDay = volumeData[volumeData['timestamp'] == currentDay].index
+    filtredVolume = volumeData.iloc[indexDay[0] : indexDay[0] + durationDays + 1]
+    return  filtredVolume
 
+print(averageVolume('2009-08-20', 4))
 
