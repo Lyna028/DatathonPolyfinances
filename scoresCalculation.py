@@ -4,20 +4,25 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
-
+from filter import marketCapDefaultData
+from filter import getReturnTable
+from filter import highData
+from filter import lowData
+from filter import closeData
+from filter import normaliseAjustedCloseData
 
 def averageVolume(currentDay, durationDays, company) :
     return 1
 
 def gapValue ( startDate, duration,company):
-    return 0 ###################################################################################################### bug a regler
+    return 0
 
 def getPositiveReturn(stock, currentDay, durationDays):
 
     return 1
 
 def getATR(lastsHigh, lastsLow, lastsClose, nValue):
-    return 1 ###################################################################################################### A VÉRIFIER
+    return 1
 
 def getMarketCapRate(actionName, startingDay, duration) :
     indexFirstDay = marketCapDefaultData[marketCapDefaultData['date'] == startingDay].index
@@ -26,17 +31,17 @@ def getMarketCapRate(actionName, startingDay, duration) :
     valueFirstDay = marketCapDefaultData.loc[indexFirstDay[0], actionName]
     valueLastDay = marketCapDefaultData.loc[indexLastDay[0], actionName]
 
-    return valueLastDay/valueFirstDay * 100 ####################################################################### Toujour à vérifier
+    return valueLastDay/valueFirstDay * 100 # Toujour à vérifier
 
 def getMarketCapAverage(stock, dayOne, nDay): 
-    return 0 ###################################################################################################### PAS FAIT
+    return 0 # PAS FAIT
 
 def getReturnAverage(stock, dayOne, nDay):
     table = getReturnTable(dayOne, nDay, stock)
     sumReturn = 0
     for i in table:
-        sum += i
-    return sum/nDay
+        sumReturn += i
+    return sumReturn/nDay
 
 def getReturnGap(stock, dayOne, nDay):
     myList = getReturnTable(dayOne, nDay, stock)
@@ -44,27 +49,27 @@ def getReturnGap(stock, dayOne, nDay):
 
 def getStockAtr(company, day, nDay):
     highIndex = highData[highData['timestamp'] == day ].index
-    highTable = highData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+    highTable = highData.iloc[highIndex[0] : highIndex[0] + nDay + 1]
 
     lowIndex = lowData[lowData['timestamp'] == day ].index
-    lowTable = lowData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+    lowTable = lowData.iloc[lowIndex[0] : lowIndex[0] + nDay + 1]
 
     closeIndex = closeData[closeData['timestamp'] == day ].index
     closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
 
-    return getATR(highTable['high_' + company], lowTable['low_' + company], closeTable['close_' + company], nDay) #### A TESTER
+    return getATR(highTable['high_' + company], lowTable['low_' + company], closeTable['close_' + company], nDay) # A TESTER
 
 def getSnpAtr(day, nDay):
     highIndex = highData[highData['timestamp'] == day ].index
-    highTable = highData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+    highTable = highData.iloc[highIndex[0] : highIndex[0] + nDay + 1]
 
     lowIndex = lowData[lowData['timestamp'] == day ].index
-    lowTable = lowData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+    lowTable = lowData.iloc[lowIndex[0] : lowIndex[0] + nDay + 1]
 
     closeIndex = closeData[closeData['timestamp'] == day ].index
     closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
 
-    return getATR(highTable['high'], lowTable['low'], closeTable['close_'], nDay)  ################################## A TESTER
+    return getATR(highTable['high'], lowTable['low'], closeTable['close_'], nDay)  # A TESTER
  
 
 def long_terme_return( stock, currentDay, durationDays):
@@ -76,10 +81,8 @@ def long_terme_return( stock, currentDay, durationDays):
 
 def getCloseLowHigh(company, dayOne, nDay):
     closeTable = list()
-
     closeIndex = closeData[closeData['timestamp'] == dayOne ].index
     closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
-
     for i in closeTable['close_' + company]:
         closeTable.append(i)
     return (min(closeTable), max(closeTable))
