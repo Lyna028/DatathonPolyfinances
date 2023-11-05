@@ -4,8 +4,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
-from tqdm import tqdm
-from sklearn.preprocessing import StandardScaler
+# from tqdm import tqdm
+# from sklearn.preprocessing import StandardScaler
 
 path = os.getcwd()
 volumeDefaultData = pd.read_csv(os.path.join(path, 'series/volume.csv'))
@@ -69,4 +69,22 @@ def long_terme_return( action, currentDay, durationDays):
 
 print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
 
+
+def getReturnByDay(entry, close):
+    return (close-entry)/entry * 100
+
+def getReturnTable(dayOne, nDay, company):
+    returnTable = list()
+    openIndex = openData[openData['timestamp'] == dayOne ].index
+    openTable = openData.iloc[openIndex[0] : openIndex[0] + nDay + 1]
+
+    closeIndex = closeData[closeData['timestamp'] == dayOne ].index
+    closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+    closeTableCompany = closeTable[company]
+
+    for i, j in zip(closeTable[company], openTable['open_CSCO']) :
+        returnTable.append(getReturnByDay(j, i))
+    return returnTable
+
+print(getReturnTable('2009-08-20', 7, 'close_CSCO'))
 
