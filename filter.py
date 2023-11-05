@@ -54,7 +54,7 @@ def averageVolume(currentDay, durationDays, company) :
 # CA MARCHE
 def long_terme_return(currentDay, durationDays, stock):
     indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == currentDay].index
-    return normaliseAjustedCloseData.loc[indexDay[0], stock] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, 'adjusted_close_' + stock]
+    return normaliseAjustedCloseData.loc[indexDay[0], 'adjusted_close_' + stock] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, 'adjusted_close_' + stock]
 
 def getReturnByDay(entry, close):
     return (close-entry)/entry * 100
@@ -83,17 +83,17 @@ def getCloseLowHigh(dayOne, nDay, company):
     closeIndex = closeData[closeData['timestamp'] == dayOne].index
     closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay]
     selectionnedDataCompany = closeTable['close_' + company]
-    print(closeTable.min())
-    return (closeTable.min(), closeTable.max())
+    return (selectionnedDataCompany.min(), selectionnedDataCompany.max())
 
-print(closeData)
-print(getCloseLowHigh('2014-12-31', 4, 'CSCO'))
+
+# print(getCloseLowHigh('2014-12-31', 4, 'CSCO'))
 def getReturnAverage(stock, dayOne, nDay):
     myList = getReturnTable(dayOne, nDay, stock)
     sumReturn = 0
     for i in myList:
         sumReturn += i
     return sumReturn/nDay
+# print(getReturnAverage( 'CSCO', '2003-12-31', 4))
 
 def getReturnGap(stock, dayOne, nDay):
     myList = getReturnTable(dayOne, nDay, stock)
@@ -104,57 +104,80 @@ def getPositiveReturn(stock, currentDay, durationDays):
     table = getReturnTable(currentDay, durationDays, stock)
     for i in table:
         nPositiveDays += 1 if i > 0 else 0
-
     return nPositiveDays/durationDays*100
 
-# def getTreeY(day, company):
-    # indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == day].index
-    # return normaliseAjustedCloseData.loc[indexDay[0]-day, company] - normaliseAjustedCloseData.loc[indexDay[0], company] 
+def getTR(high, low, close) :
+    return max( high-low, high-close, low-close)
 
-## la suivante existe en attendant que le normalise fonctionne
+def createAtr(lastsHigh, lastsLow, lastsClose, nValue) :
+    sum = 0
+    for high, low, close in zip(lastsHigh, lastsLow, lastsClose) :
+        sum += getTR(high, low, close)
+    return sum/nValue
 
-# def getTreeX(day, company):
-#     treeXDict = {
-#         "stockAtr" : getStockAtr(company, day, 100), # 100 est une valeur arbitraire choisi plus tard dans l'opti
-#         "snpAtr" : getSnpAtr(day, 100),
-#         "longReturn" : long_terme_return(company, day, 100),
-#         "valueGap" : gapValue(day, 100, company),
-#         "averageVolume" : averageVolume(day, 100, company),
-#         "positiveReturnRatio" : getPositiveReturn(company, day, 100),
-#         "marketCapRate" : getMarketCapRate(company, day, 100), ######################################
-#         "marketCapAverage" : getMarketCapAverage(company, day, 100), ################################
-#         "returnAverage" : getReturnAverage(company, day, 100),
-#         "returnGap" : getReturnGap(company, day, 100),
-#         "lowestClose" : getCloseLowHigh(company, day, 100)[0],
-#         "highestClose" : getCloseLowHigh(company, day, 100)[1]
-#     }
-#     return treeXDict
+def getStockAtr(company, day, nDay):
+    highIndex = highData[highData['timestamp'] == day ].index
+    highTable = highData.iloc[highIndex[0] : highIndex[0] + nDay + 1]
+
+    lowIndex = lowData[lowData['timestamp'] == day ].index
+    lowTable = lowData.iloc[lowIndex[0] : lowIndex[0] + nDay + 1]
+
+    closeIndex = closeData[closeData['timestamp'] == day ].index
+    closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+
+    return createAtr(highTable['high_' + company], lowTable['low_' + company], closeTable['close_' + company], nDay) 
+
+
+def getSnpAtr(day, nDay):
+    highIndex = highData[highData['timestamp'] == day ].index
+    highTable = highData.iloc[highIndex[0] : highIndex[0] + nDay + 1]
+
+    lowIndex = lowData[lowData['timestamp'] == day ].index
+    lowTable = lowData.iloc[lowIndex[0] : lowIndex[0] + nDay + 1]
+
+    closeIndex = closeData[closeData['timestamp'] == day ].index
+    closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+
+    return createAtr(highTable['high'], lowTable['low'], closeTable['close_'], nDay)  # A TESTER
+
 
 def getTreeY(day, company, nDay):
-    indexDay = closeData[closeData['timestamp'] == day].index
-    return closeData.loc[indexDay[0]-nDay, 'close_' + company] - closeData.loc[indexDay[0], 'close_' + company] 
+    indexDay = ajustedCloseData[ajustedCloseData['timestamp'] == day].index
+    rendementVal = ajustedCloseData.loc[indexDay[0]-nDay, 'adjusted_close_' + company] - ajustedCloseData.loc[indexDay[0], 'adjusted_close_' + company]
+
+    return rendementVal/closeData.loc[indexDay[0], 'close_' + company] * 100
 
 def getTreeX(day, company):
-    treeXList = (getStockAtr(company, day, 100), getSnpAtr(day, 100), long_terme_return(company, day, 100), gapValue(day, 100, company),
+    treeXList = (getStockAtr(company, day, 100), long_terme_return(day, 100, company), gapValue(day, 100, company),
                  averageVolume(day, 100, company), getPositiveReturn(company, day, 100), getReturnAverage(company, day, 100), 
-                 getCloseLowHigh(company, day, 100)[0], getCloseLowHigh(company, day, 100)[1] )
+                 getCloseLowHigh(day, 100, company)[0], getCloseLowHigh(day, 100, company)[1] )
     return treeXList
 
 def createXbySector(sector, day):
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
     xSectorTable = list()
+    indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
-        xSectorTable.append(getTreeX(day, i))
+        for j in range(25):
+            actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
+            xSectorTable.append(getTreeX(actualDay, i))
     return xSectorTable
+
+
 
 def createYbySector(sector, day):
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
     ySectorTable = list()
+    indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
-        ySectorTable.append(getTreeY(day, i))
+        for j in range(25):
+            actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
+            ySectorTable.append(getTreeY(actualDay, i, 100))
     return ySectorTable
 
+# print(createYbySector('Industrials', '2013-11-05'))
+# print(createYbySector('Industrials', '2013-11-05'))
 
-createXbySector('Industrials')
+# createXbySector('Industrials')
