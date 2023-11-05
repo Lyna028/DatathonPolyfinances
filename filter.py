@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 # from tqdm import tqdm
-# from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 path = os.getcwd()
 volumeDefaultData = pd.read_csv(os.path.join(path, 'series/volume.csv'))
@@ -17,6 +17,7 @@ marketCapDefaultData = pd.read_csv(os.path.join(path, 'series/additional_data/ma
 ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.csv'))
 
 def filterYears(data) :
+    if 'timestamp' in
     filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
     return filtered_data.reset_index(drop=True)
 
@@ -32,7 +33,7 @@ openData = filterYears(openDefaultData)
 highData = filterYears(highDefaultData)
 closeData = filterYears(closeDefaultData)
 lowData = filterYears(lowDefaultData)
-marketCapData = filterYears(marketCapDefaultData)
+#marketCapData = filterYears(marketCapDefaultData)
 ajustedCloseData = filterYears(ajustedCloseDefaultData)
 normaliseAjustedCloseData = normalize_data(ajustedCloseData)
 
@@ -52,23 +53,19 @@ def ecartTypeValue ( startDate, duration,company):
     return ecartTypeValue
 
 def averageMarketCap(currentDay, durationDays, company) :
-    indexDay = marketCapData[volumeData['date'] == currentDay].index
-    filtredMerketCap = marketCapData.iloc[indexDay[0]: indexDay[0] + durationDays]
-    marketCapSum = filtredMerketCap[company].sum()
+    indexDay = marketCapDefaultData[marketCapDefaultData['date'] == currentDay].index
+    filtredMarketCap = marketCapDefaultData.iloc[indexDay[0]: indexDay[0] + durationDays + 1]
+    marketCapSum = filtredMarketCap[company].sum()
     #return marketCapSum/durationDays
-    return filtredMerketCap
+    return filtredMarketCap
+
+print(averageMarketCap('2018-10-31', 4, 'market_cap_CSCO'))
 
 def long_terme_return( action, currentDay, durationDays):
     indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == currentDay].index
     print(normaliseAjustedCloseData.loc[indexDay[0], action])
     print(normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action])
     return normaliseAjustedCloseData.loc[indexDay[0], action] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action]
-
-#def finalFilter(currentDay, durationDays) :
-
-
-print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
-
 
 def getReturnByDay(entry, close):
     return (close-entry)/entry * 100
@@ -85,6 +82,3 @@ def getReturnTable(dayOne, nDay, company):
     for i, j in zip(closeTable[company], openTable['open_CSCO']) :
         returnTable.append(getReturnByDay(j, i))
     return returnTable
-
-print(getReturnTable('2009-08-20', 7, 'close_CSCO'))
-
