@@ -33,9 +33,13 @@ openData = filterYears(openDefaultData)
 highData = filterYears(highDefaultData)
 closeData = filterYears(closeDefaultData)
 lowData = filterYears(lowDefaultData)
+<<<<<<< Updated upstream
 #marketCapData = filterYears(marketCapDefaultData)
+=======
+# marketCapData = filterYears(marketCapDefaultData)
+>>>>>>> Stashed changes
 ajustedCloseData = filterYears(ajustedCloseDefaultData)
-normaliseAjustedCloseData = normalize_data(ajustedCloseData)
+# normaliseAjustedCloseData = normalize_data(ajustedCloseData)
 
 def averageVolume(currentDay, durationDays, company) :
     indexDay = volumeData[volumeData['timestamp'] == currentDay].index
@@ -52,6 +56,7 @@ def ecartTypeValue ( startDate, duration,company):
     ecartTypeValue = valMax-valMin
     return ecartTypeValue
 
+<<<<<<< Updated upstream
 def averageMarketCap(currentDay, durationDays, company) :
     indexDay = marketCapDefaultData[marketCapDefaultData['date'] == currentDay].index
     filtredMarketCap = marketCapDefaultData.iloc[indexDay[0]: indexDay[0] + durationDays + 1]
@@ -60,6 +65,14 @@ def averageMarketCap(currentDay, durationDays, company) :
     return filtredMarketCap
 
 print(averageMarketCap('2018-10-31', 4, 'market_cap_CSCO'))
+=======
+# def averageMarketCap(currentDay, durationDays, company) :
+#     indexDay = marketCapData[volumeData['date'] == currentDay].index
+#     filtredMerketCap = marketCapData.iloc[indexDay[0]: indexDay[0] + durationDays]
+#     marketCapSum = filtredMerketCap[company].sum()
+#     #return marketCapSum/durationDays
+#     return filtredMerketCap
+>>>>>>> Stashed changes
 
 def long_terme_return( action, currentDay, durationDays):
     indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == currentDay].index
@@ -67,18 +80,48 @@ def long_terme_return( action, currentDay, durationDays):
     print(normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action])
     return normaliseAjustedCloseData.loc[indexDay[0], action] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action]
 
+<<<<<<< Updated upstream
+=======
+#def finalFilter(currentDay, durationDays) :
+
+
+# print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
+
+
+>>>>>>> Stashed changes
 def getReturnByDay(entry, close):
     return (close-entry)/entry * 100
 
 def getReturnTable(dayOne, nDay, company):
     returnTable = list()
+
     openIndex = openData[openData['timestamp'] == dayOne ].index
     openTable = openData.iloc[openIndex[0] : openIndex[0] + nDay + 1]
 
     closeIndex = closeData[closeData['timestamp'] == dayOne ].index
     closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
-    closeTableCompany = closeTable[company]
 
-    for i, j in zip(closeTable[company], openTable['open_CSCO']) :
+    for i, j in zip(closeTable['close_' + company], openTable['open_' + company]) :
         returnTable.append(getReturnByDay(j, i))
     return returnTable
+<<<<<<< Updated upstream
+=======
+
+print(getReturnTable('2009-08-20', 7, 'CSCO'))
+
+def getPositiveReturn(action, currentDay, durationDays):
+    nPositiveDays = 0
+    table = getReturnTable(currentDay, durationDays, action);
+    for i in table:
+        nPositiveDays += 1 if i > 0 else 0
+
+    return nPositiveDays/durationDays*100
+
+def getValueGap(dayOne, nDay, company):
+    adjustedCloseIndex = ajustedCloseData[ajustedCloseData['timestamp'] == dayOne ].index
+    adjustedCloseTable = ajustedCloseData.iloc[adjustedCloseIndex[0] : adjustedCloseIndex[0] + nDay + 1]
+    closeList = 
+    for i in adjustedCloseTable :
+
+
+>>>>>>> Stashed changes
