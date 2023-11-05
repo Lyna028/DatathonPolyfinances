@@ -16,10 +16,10 @@ lowDefaultData = pd.read_csv(os.path.join(path, 'series/low.csv'))
 marketCapDefaultData = pd.read_csv(os.path.join(path, 'series/additional_data/market_cap.csv'))
 ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.csv'))
 
-def filterYears(data) :
-    if 'timestamp' in
-    filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
-    return filtered_data.reset_index(drop=True)
+# def filterYears(data) :
+#     if 'timestamp' in
+#     filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
+#     return filtered_data.reset_index(drop=True)
 
 def normalize_data(data):
     timestamps = data['timestamp']
