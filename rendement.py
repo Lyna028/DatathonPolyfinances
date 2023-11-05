@@ -8,3 +8,5 @@ import matplotlib
 def getReturnByDay(entry, close):
     return (entry-close)/entry * 100
 
+def getReturnTable(dayOne, nDay):
+    volumeData

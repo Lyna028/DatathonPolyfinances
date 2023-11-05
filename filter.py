@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 # from tqdm import tqdm
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 
 path = os.getcwd()
 volumeDefaultData = pd.read_csv(os.path.join(path, 'series/volume.csv'))
@@ -16,10 +16,9 @@ lowDefaultData = pd.read_csv(os.path.join(path, 'series/low.csv'))
 marketCapDefaultData = pd.read_csv(os.path.join(path, 'series/additional_data/market_cap.csv'))
 ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.csv'))
 
-# def filterYears(data) :
-#     if 'timestamp' in
-#     filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
-#     return filtered_data.reset_index(drop=True)
+def filterYears(data) :
+    filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
+    return filtered_data.reset_index(drop=True)
 
 def normalize_data(data):
     timestamps = data['timestamp']
@@ -33,11 +32,7 @@ openData = filterYears(openDefaultData)
 highData = filterYears(highDefaultData)
 closeData = filterYears(closeDefaultData)
 lowData = filterYears(lowDefaultData)
-<<<<<<< Updated upstream
-#marketCapData = filterYears(marketCapDefaultData)
-=======
 # marketCapData = filterYears(marketCapDefaultData)
->>>>>>> Stashed changes
 ajustedCloseData = filterYears(ajustedCloseDefaultData)
 # normaliseAjustedCloseData = normalize_data(ajustedCloseData)
 
@@ -47,48 +42,35 @@ def averageVolume(currentDay, durationDays, company) :
     volumSum = filtredVolume[company].sum()
     return volumSum/durationDays
 
-def ecartTypeValue ( startDate, duration,company):
-    selectionnedDataIndex = ajustedCloseData[ajustedCloseData['timestamp'] == startDate].index
-    selectionnedData = ajustedCloseData.iloc[selectionnedDataIndex[0] : selectionnedDataIndex[0] + duration +1]
-    selectionnedDataCompany = selectionnedData[company]
-    valMax = selectionnedDataCompany.max()
-    valMin = selectionnedDataCompany.min()
-    ecartTypeValue = valMax-valMin
-    return ecartTypeValue
+def gapValue ( startDate, duration,company):
+    selectionnedDataIndex = ajustedCloseData[ajustedCloseData['timestamp'] == '2023-10-04'].index
+    # selectionnedData = ajustedCloseData.iloc[selectionnedDataIndex[0] : selectionnedDataIndex[0] + duration +1]
+    # selectionnedDataCompany = selectionnedData[company]
+    # valMax = selectionnedDataCompany.max()
+    # valMin = selectionnedDataCompany.min()
+    # gapValue = valMax-valMin
+    # return gapValue
 
-<<<<<<< Updated upstream
-def averageMarketCap(currentDay, durationDays, company) :
-    indexDay = marketCapDefaultData[marketCapDefaultData['date'] == currentDay].index
-    filtredMarketCap = marketCapDefaultData.iloc[indexDay[0]: indexDay[0] + durationDays + 1]
-    marketCapSum = filtredMarketCap[company].sum()
-    #return marketCapSum/durationDays
-    return filtredMarketCap
 
-print(averageMarketCap('2018-10-31', 4, 'market_cap_CSCO'))
-=======
 # def averageMarketCap(currentDay, durationDays, company) :
 #     indexDay = marketCapData[volumeData['date'] == currentDay].index
 #     filtredMerketCap = marketCapData.iloc[indexDay[0]: indexDay[0] + durationDays]
 #     marketCapSum = filtredMerketCap[company].sum()
 #     #return marketCapSum/durationDays
 #     return filtredMerketCap
->>>>>>> Stashed changes
 
-def long_terme_return( action, currentDay, durationDays):
+def long_terme_return( stock, currentDay, durationDays):
     indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == currentDay].index
-    print(normaliseAjustedCloseData.loc[indexDay[0], action])
-    print(normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action])
-    return normaliseAjustedCloseData.loc[indexDay[0], action] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, action]
+    print(normaliseAjustedCloseData.loc[indexDay[0], stock])
+    print(normaliseAjustedCloseData.loc[indexDay[0]+durationDays, stock])
+    return normaliseAjustedCloseData.loc[indexDay[0], stock] - normaliseAjustedCloseData.loc[indexDay[0]+durationDays, stock]
 
-<<<<<<< Updated upstream
-=======
+
 #def finalFilter(currentDay, durationDays) :
 
 
 # print(averageMarketCap('2009-08-20', 4, 'volume_CSCO'))
 
-
->>>>>>> Stashed changes
 def getReturnByDay(entry, close):
     return (close-entry)/entry * 100
 
@@ -104,24 +86,43 @@ def getReturnTable(dayOne, nDay, company):
     for i, j in zip(closeTable['close_' + company], openTable['open_' + company]) :
         returnTable.append(getReturnByDay(j, i))
     return returnTable
-<<<<<<< Updated upstream
-=======
+
+def getCloseLowHigh(company, dayOne, nDay):
+    closeTable = list()
+
+    closeIndex = closeData[closeData['timestamp'] == dayOne ].index
+    closeTable = closeData.iloc[closeIndex[0] : closeIndex[0] + nDay + 1]
+
+    for i in closeTable['close_' + company]:
+        closeTable.append(i)
+    return (min(closeTable), max(closeTable))
 
 print(getReturnTable('2009-08-20', 7, 'CSCO'))
 
-def getPositiveReturn(action, currentDay, durationDays):
+def getReturnAverage(stock, dayOne, nDay):
+    myList = getReturnTable(dayOne, nDay, stock)
+    sumReturn = 0
+    for i in myList:
+        sumReturn += i
+    return sumReturn/nDay
+
+def getReturnGap(stock, dayOne, nDay):
+    myList = getReturnTable(dayOne, nDay, stock)
+    return max(myList) - min(myList)
+
+def getPositiveReturn(stock, currentDay, durationDays):
     nPositiveDays = 0
-    table = getReturnTable(currentDay, durationDays, action);
+    table = getReturnTable(currentDay, durationDays, stock)
     for i in table:
         nPositiveDays += 1 if i > 0 else 0
 
     return nPositiveDays/durationDays*100
 
-def getValueGap(dayOne, nDay, company):
-    adjustedCloseIndex = ajustedCloseData[ajustedCloseData['timestamp'] == dayOne ].index
-    adjustedCloseTable = ajustedCloseData.iloc[adjustedCloseIndex[0] : adjustedCloseIndex[0] + nDay + 1]
-    closeList = 
-    for i in adjustedCloseTable :
+# def getTreeY(day, company):
+    # indexDay = normaliseAjustedCloseData[normaliseAjustedCloseData['timestamp'] == day].index
+    # return normaliseAjustedCloseData.loc[indexDay[0]-day, company] - normaliseAjustedCloseData.loc[indexDay[0], company] 
 
-
->>>>>>> Stashed changes
+## la suivante existe en attendant que le normalise fonctionne
+def getTreeY(day, company, nDay):
+    indexDay = closeData[closeData['timestamp'] == day].index
+    return closeData.loc[indexDay[0]-nDay, 'close_' + company] - closeData.loc[indexDay[0], 'close_' + company] 
