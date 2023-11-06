@@ -18,7 +18,7 @@ ajustedCloseDefaultData = pd.read_csv(os.path.join(path, 'series/adjusted_close.
 symbolInfo = pd.read_csv(os.path.join(path, 'series/additional_data/SP500_symbol_info.csv'))
 
 def filterYears(data) :
-    filtered_data = data[(data['timestamp'] >= '2000-01-01') & (data['timestamp'] <= '2015-01-01')]
+    filtered_data = data[(data['timestamp'] <= '2015-01-01')]
     return filtered_data.reset_index(drop=True)
 
 def normalize_data(data):
@@ -148,16 +148,21 @@ def getTreeY(day, company, nDay):
     return rendementVal/closeData.loc[indexDay[0], 'close_' + company] * 100
 
 def getTreeX(day, company):
-    treeXList = (getStockAtr(company, day, 100), long_terme_return(day, 100, company), gapValue(day, 100, company),
-                 averageVolume(day, 100, company), getPositiveReturn(company, day, 100), getReturnAverage(company, day, 100), 
-                 getCloseLowHigh(day, 100, company)[0], getCloseLowHigh(day, 100, company)[1] )
+    nDay = 100
+    if day == '2000-01-03' :
+        nDay = 20
+    if day == '2000-08-04' :
+        nDay = 80
+    treeXList = (getStockAtr(company, day, nDay), long_terme_return(day, nDay, company), gapValue(day, nDay, company),
+                 averageVolume(day, nDay, company), getPositiveReturn(company, day, nDay), getReturnAverage(company, day, nDay), 
+                 getCloseLowHigh(day, nDay, company)[0], getCloseLowHigh(day, nDay, company)[1] )
     treeXListRound = list()
     for x in treeXList:
         treeXListRound.append(round(x, 3))
     return treeXListRound
 ## averageVolume(day, 100, company),
 
-def createXbySector(sector, day):
+def createXbySector(sector, day, k):
     print(sector)
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
@@ -166,32 +171,32 @@ def createXbySector(sector, day):
     indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
         for j in range(25):
-            actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
+            actualDay = openData.loc[indexDate[0] + j*k, 'timestamp']
             xSectorTable.append(getTreeX(actualDay, i))
     return xSectorTable
 # print(createXbySector('Health Care', '2012-11-14'))
 
 
 
-def createYbySector(sector, day):
+def createYbySector(sector, day, k):
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
     ySectorTable = list()
     indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
         for j in range(25):
-            actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
+            actualDay = openData.loc[indexDate[0] + j*k, 'timestamp']
             ySectorTable.append(getTreeY(actualDay, i, 100))
     return ySectorTable
 
-def createYriskBySector(sector, day):
+def createYriskBySector(sector, day, k):
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
     ySectorTable = list()
     indexDate = openData[openData['timestamp'] == day].index
     for i in sectorSymbols:
         for j in range(25):
-            actualDay = openData.loc[indexDate[0] + j*5 - 100, 'timestamp']
+            actualDay = openData.loc[indexDate[0] + j*k - 100, 'timestamp']
             ySectorTable.append(getStockAtr(i, actualDay, 100))
     return ySectorTable
 

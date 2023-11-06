@@ -28,15 +28,20 @@ def getPredictOnDate(day):
     listReturn = list()
     listRisk = list()
     sectorList = list()
+    k = 5
+    if day == '2000-01-03' : 
+        k = 0
+    elif day == '2000-08-04' :
+        k = 3
     for stock in symbolInfo["Symbol"]:
         indexStock = symbolInfo[symbolInfo['Symbol'] == stock].index
         if symbolInfo.at[indexStock[0], 'GICS Sector'] not in sectorList:
             sectorList.append(symbolInfo.at[indexStock[0], 'GICS Sector'])
     for sector in sectorList :
         if True:
-            X = createXbySector(sector, day)
-            Y = createYbySector(sector, day)
-            yRisk = createYriskBySector(sector, day)
+            X = createXbySector(sector, day, k)
+            Y = createYbySector(sector, day, k)
+            yRisk = createYriskBySector(sector, day, k)
             nan_index = []
             for index, value in enumerate(Y):
                 if math.isnan(value):
@@ -93,16 +98,8 @@ def getPredictOnDate(day):
                         if math.isnan(elem):
                             xNan = True
                     if not xNan:
-                        # X_calc = list()
-                        # Xrisk_calc = list()
-                        # X_calc.append(getTreeX(day, stock))
-                        # Xrisk_calc.append(getTreeX(day, stock))
-                        # y_predTest = regr.predict(X_test)
-                        # print(y_predTest)
                         y_preds = regr.predict(np.array([getTreeX(day, stock)]))
                         yRisk_preds = regrRisk.predict(np.array([getTreeX(day, stock)]))
-                        # print(y_preds[0])
-                        # print(yRisk_preds[0])
                         listReturn.append(y_preds[0])
                         listRisk.append(yRisk_preds[0])
                         listStock.append(stock)
@@ -115,4 +112,4 @@ def getPredictOnDate(day):
 
         
 
-getPredictOnDate('2007-11-09')
+# getPredictOnDate('2007-11-09')
