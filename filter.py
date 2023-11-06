@@ -151,9 +151,14 @@ def getTreeX(day, company):
     treeXList = (getStockAtr(company, day, 100), long_terme_return(day, 100, company), gapValue(day, 100, company),
                  averageVolume(day, 100, company), getPositiveReturn(company, day, 100), getReturnAverage(company, day, 100), 
                  getCloseLowHigh(day, 100, company)[0], getCloseLowHigh(day, 100, company)[1] )
-    return treeXList
+    treeXListRound = list()
+    for x in treeXList:
+        treeXListRound.append(round(x, 3))
+    return treeXListRound
+## averageVolume(day, 100, company),
 
 def createXbySector(sector, day):
+    print(sector)
     sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
     sectorSymbols = sectorTable['Symbol']
     # print(sectorSymbols)
@@ -177,6 +182,17 @@ def createYbySector(sector, day):
         for j in range(25):
             actualDay = openData.loc[indexDate[0] + j*5, 'timestamp']
             ySectorTable.append(getTreeY(actualDay, i, 100))
+    return ySectorTable
+
+def createYriskBySector(sector, day):
+    sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
+    sectorSymbols = sectorTable['Symbol']
+    ySectorTable = list()
+    indexDate = openData[openData['timestamp'] == day].index
+    for i in sectorSymbols:
+        for j in range(25):
+            actualDay = openData.loc[indexDate[0] + j*5 - 100, 'timestamp']
+            ySectorTable.append(getStockAtr(i, actualDay, 100))
     return ySectorTable
 
 # print(createYbySector('Industrials', '2013-11-05'))
