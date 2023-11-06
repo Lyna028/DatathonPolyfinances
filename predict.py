@@ -107,7 +107,8 @@ def getPredictOnDate(day):
                         listRisk.append(yRisk_preds[0])
                         listStock.append(stock)
                         listSector.append(sector)
-    df = pd.DataFrame({'Stock' : listStock, 'Sector' : listSector, 'Return' : listReturn, 'Risk' : listRisk})
+    normalized_Return = [(x - np.mean(listReturn)) / np.std(listReturn) for x in listReturn]
+    df = pd.DataFrame({'Stock' : listStock, 'Sector' : listSector, 'Return' : normalized_Return, 'Risk' : listRisk})
     print(df)
     return df
 
@@ -115,14 +116,3 @@ def getPredictOnDate(day):
         
 
 getPredictOnDate('2007-11-09')
-
-
-# df= pd.DataFrame({'Actual': y_real, 'Predicted': y_pred})
-# print(df)
-
-
-# print(regr.feature_importances_)
-
-# print(r2_score(y_real, y_pred))
-# print(mean_squared_error(y_real, y_pred))
-# print(mean_absolute_error(y_real, y_pred))
