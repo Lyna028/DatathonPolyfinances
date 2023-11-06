@@ -151,7 +151,7 @@ def getTreeX(day, company):
     nDay = 100
     if day == '2000-01-03' :
         nDay = 20
-    if day == '2000-08-04' :
+    if day == '2000-08-07' :
         nDay = 80
     treeXList = (getStockAtr(company, day, nDay), long_terme_return(day, nDay, company), gapValue(day, nDay, company),
                  averageVolume(day, nDay, company), getPositiveReturn(company, day, nDay), getReturnAverage(company, day, nDay), 
@@ -186,18 +186,7 @@ def createYbySector(sector, day, k):
     for i in sectorSymbols:
         for j in range(25):
             actualDay = openData.loc[indexDate[0] + j*k, 'timestamp']
-            ySectorTable.append(getTreeY(actualDay, i, 100))
-    return ySectorTable
-
-def createYriskBySector(sector, day, k):
-    sectorTable = symbolInfo[symbolInfo['GICS Sector'] == sector]
-    sectorSymbols = sectorTable['Symbol']
-    ySectorTable = list()
-    indexDate = openData[openData['timestamp'] == day].index
-    for i in sectorSymbols:
-        for j in range(25):
-            actualDay = openData.loc[indexDate[0] + j*k - 100, 'timestamp']
-            ySectorTable.append(getStockAtr(i, actualDay, 100))
+            ySectorTable.append(getTreeY(actualDay, i, k - 1))
     return ySectorTable
 
 # print(createYbySector('Industrials', '2013-11-05'))

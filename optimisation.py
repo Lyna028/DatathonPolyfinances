@@ -67,7 +67,7 @@ def optimizeWallet(day) :
 
 dfSubmit = pd.DataFrame(submissionDf)
 print(dfSubmit)
-for i in range(0, 150, 150) : ### 3772
+for i in range(0, 3772, 150) : ### 3772
     indexDate = dfSubmit[dfSubmit['id'] == i].index
     date = dfSubmit.at[indexDate[0], 'date']
     myWallet = optimizeWallet(date)
@@ -83,7 +83,9 @@ for i in range(0, 150, 150) : ### 3772
                 if column == 'weight_' + key :
                     isInWallet = True
                     value_ = abs(value)
-            for j in range(i, i+149, 1) :
+            for j in range(i, i+150, 1) :
+                if j == 3773:
+                    break
                 dfSubmit.at[j, column] = value_
 print(dfSubmit)
 dfSubmit.to_csv('series/submissionResult.csv')
