@@ -40,3 +40,10 @@ L'algorithme de prédiction est fait pour recevoir une date et retourner un data
 Il crée un part un les arbre de chaques secteur, prédit la valeur de rendement pour J = dateDonnée pour chaque stock du secteur et enfin ajoute les données au dataFrame. le tout en prenant bien en compte de supprimer les valeurs NaN qui pourraient casser notre algorithme et représente de toute façon un stock à oublié tant qu'il est NaN.
 
 ### Optimisation du portefeuille
+
+Maintenant que nous avons nos estimations de rendement nous devons les utiliser pour optimiser notre portefeuille sur le principe de long-only tout en gardant en tête les critères du portefeuille comme le minimum de 5% des pondération pour chaque secteur.
+
+Pour ce faire nous avons le script Optimisation qui est notre script principal et qui appelle la fonction d'optimisation du portefeuille de façon répété tous les Y jours (ici 150 pour le long-only).
+Le script modifie donc le csv de "submission" pour mettre les pondérations trouvé sur les 150 prochains jours (nous gardons nos pondération pour limiter le taux de renouvellement annuel). Les actions n'étant pas dans les 130 séléctionné ont leur poid à 0.
+#### Fonction d'optimisation des pondérations
+Cette fonction dans le [optimisation.py](DatathonPolyfinances/optimisation.py) re
