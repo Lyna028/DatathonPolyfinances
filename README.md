@@ -1,7 +1,7 @@
 # DatathonPolyfinances
 ## Rose Lizé, Zoé Paradis, Lyna Kettani, Maxence Lhuisset
 Ce github présente le projet du Datathon de Polyfinance 2023 de notre équipe. L'objectif étant d'optimiser un portefeuille sur le S&P500 sur la période de 2000 à 2015
-## Méthodologie
+## Fonctionnement
 ### Clean DataSet
 Nous avons commencé par lire les donnée récupéré depuis les CSV du sujet puis par néttoyer nos DataFrame dans filter.py. Nous avons pris uniquements les valeurs intéréssantes dans notre cas puis avons normalisé les valeurs si cela est pertinant
 ### Calcul des métriques
@@ -28,13 +28,13 @@ Ainsi nous avons plus de données que si l'on prenait seulements les anciennent 
 
 #### Retour des prédictions
 
-L'algorithme de prédiction est fait pour recevoir une date et retourner un dataset du type :
+L'algorithme de prédiction est fait pour recevoir une date et retourner un dataset normalisé du type :
 
 | **Stock** | **Secteur** | **Rendement** |
 |-----------|-------------|---------------|
-|  ADP      | Finance     | 2             |
-| PFI       | Santé       | 1.5           |
-| MMM       | Industriel  | -2.4          |
+|  ADP      | Finance     | 0.3           |
+| PFI       | Santé       | 1.1           |
+| MMM       | Industriel  | -0.5          |
 | ...       | ...         | ...           |
 
 Il crée un part un les arbre de chaques secteur, prédit la valeur de rendement pour J = dateDonnée pour chaque stock du secteur et enfin ajoute les données au dataFrame. le tout en prenant bien en compte de supprimer les valeurs NaN qui pourraient casser notre algorithme et représente de toute façon un stock à oublié tant qu'il est NaN.
@@ -51,7 +51,7 @@ Il vérifie ensuite le pourcentage des rendements totaux pour chaques secteur.
 Ayans des valeurs de prédictions très précises et en quantité nous avons fait une optimisation simple:
 - *Poids de chaque secteur* : On prend une partie de la pondérations des secteurs les plus représenté dans les 130 meilleurs rendements pour les distribuer aux secteurs sous 5%.
 - *Poids des stock dans leur secteur* : On calcul les taux par rapport au rendement total d'un secteur de tous ses stock
-- *Poid global de chaque stock* : le poid total de d'un stock dans le secteur multiplié par le poids du secteur donne le poids global d'un stock.
+- *Poid global de chaque stock* : le poid total d'un stock dans le secteur multiplié par le poids du secteur donne le poids global d'un stock.
 
 ## Utilisation de la solution 
 Cette solution génère le CSV de notre portefeuilles avec pondérations journalières du 2000-01-03(premier jour ouvert de 2000) au 2015-01-01. Ce CSV est généré (15 min environ) à l'éxécution de :
@@ -59,5 +59,6 @@ Cette solution génère le CSV de notre portefeuilles avec pondérations journal
 les fonctions et variables utilisé sont répartis dans :
 - [filter.py](filter.py)
 - [predict.py](predict.py)
+
 Elles utilisent les données des *.csv dans [series](series)
 
