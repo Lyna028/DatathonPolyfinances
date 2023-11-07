@@ -46,4 +46,18 @@ Maintenant que nous avons nos estimations de rendement nous devons les utiliser 
 Pour ce faire nous avons le script Optimisation qui est notre script principal et qui appelle la fonction d'optimisation du portefeuille de façon répété tous les Y jours (ici 150 pour le long-only).
 Le script modifie donc le csv de "submission" pour mettre les pondérations trouvé sur les 150 prochains jours (nous gardons nos pondération pour limiter le taux de renouvellement annuel). Les actions n'étant pas dans les 130 séléctionné ont leur poid à 0.
 #### Fonction d'optimisation des pondérations
-Cette fonction dans le [optimisation.py](DatathonPolyfinances/optimisation.py) re
+Cette fonction **optimizeWallet()** dans le [optimisation.py](optimisation.py) reçoit un jour et appel la fonction de prédiction. Il récupère ensuite les 130 meilleurs rendements prédis, les stocks correspondants et leurs secteurs. 
+Il vérifie ensuite le pourcentage des rendements totaux pour chaques secteur.
+Ayans des valeurs de prédictions très précises et en quantité nous avons fait une optimisation simple:
+- *Poids de chaque secteur* : On prend une partie de la pondérations des secteurs les plus représenté dans les 130 meilleurs rendements pour les distribuer aux secteurs sous 5%.
+- *Poids des stock dans leur secteur* : On calcul les taux par rapport au rendement total d'un secteur de tous ses stock
+- *Poid global de chaque stock* : le poid total de d'un stock dans le secteur multiplié par le poids du secteur donne le poids global d'un stock.
+
+## Utilisation de la solution 
+Cette solution génère le CSV de notre portefeuilles avec pondérations journalières du 2000-01-03(premier jour ouvert de 2000) au 2015-01-01. Ce CSV est généré (15 min environ) à l'éxécution de :
+[optimisation.py](optimisation.py)
+les fonctions et variables utilisé sont répartis dans :
+- [filter.py](filter.py)
+- [predict.py](predict.py)
+Elles utilisent les données des *.csv dans [series](series)
+
