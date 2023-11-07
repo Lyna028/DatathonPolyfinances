@@ -63,4 +63,4 @@ les fonctions et variables utilisé sont répartis dans :
 Elles utilisent les données des *.csv dans [series](series)
 
 ### RESULT
-Vous pouvez trouvé [ici](submissionResultCopy.csv) le csv généré par notre script à la fin du Datathon.
+Vous pouvez trouver [ici](submissionResultCopy.csv) le csv généré par notre script à la fin du Datathon.
