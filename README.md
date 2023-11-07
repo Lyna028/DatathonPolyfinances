@@ -61,5 +61,6 @@ les fonctions et variables utilisé sont répartis dans :
 - [predict.py](predict.py)
 
 Elles utilisent les données des *.csv dans [series](series)
+
 ### RESULT
 Vous pouvez trouvé [ici](submissionResultCopy.csv) le csv généré par notre script à la fin du Datathon.
